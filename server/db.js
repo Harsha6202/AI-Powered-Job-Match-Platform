@@ -5,7 +5,7 @@ module.exports = async () => {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     };
-
+    
     try {
         // Log the database URI to ensure it's correctly loaded
         console.log('Database URI:', process.env.DB);

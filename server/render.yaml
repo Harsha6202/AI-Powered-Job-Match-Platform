@@ -19,3 +19,5 @@ services:
         sync: false
       - key: CLIENT_URL
         value: https://ai-powered-job-match.vercel.app
+      - key: API_URL
+        value: https://ai-powered-job-match-platform-0g7r.onrender.com
