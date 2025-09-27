@@ -14,9 +14,8 @@ connection();
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
     ? process.env.ALLOWED_ORIGINS.split(',')
     : [
-        'https://ai-job-match.azurestaticapps.net',
-        'https://ai-powered-job-match.netlify.app',
-        'https://ai-powered-job-match-platform.vercel.app',
+        'https://lemon-coast-01b0ad500.3.azurestaticapps.net',
+        'https://zealous-plant-030f3a200.3.azurestaticapps.net',
         'http://localhost:3000'
     ];
 
