@@ -1,10 +1,11 @@
 {
-  "name": "ai-job-match-api",
+  "name": "jobmatchplatform-server",
   "env": {
-    "ALLOWED_ORIGINS": "https://lemon-coast-01b0ad500.3.azurestaticapps.net,https://zealous-plant-030f3a200.3.azurestaticapps.net",
-    "BASE_URL": "https://ai-job-match-api.azurewebsites.net",
+    "ALLOWED_ORIGINS": "https://lemon-coast-01b0ad500.3.azurestaticapps.net",
+    "BASE_URL": "https://jobmatchplatform-server.azurewebsites.net",
     "CLIENT_URL": "https://lemon-coast-01b0ad500.3.azurestaticapps.net",
     "PORT": "8080",
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "WEBSITE_NODE_DEFAULT_VERSION": "20.19.1"
   }
 }

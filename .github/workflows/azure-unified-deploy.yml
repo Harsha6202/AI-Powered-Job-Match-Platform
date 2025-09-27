@@ -1,0 +1,89 @@
+name: Azure Unified Deployment
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - main
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  # Backend deployment job
+  deploy-backend:
+    runs-on: ubuntu-latest
+    name: Deploy Backend
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: './server/package-lock.json'
+
+      - name: Install Backend Dependencies
+        working-directory: ./server
+        run: npm ci
+
+      - name: Deploy Backend to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'jobmatchplatform-server'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./server
+        env:
+          NODE_ENV: production
+          DB: ${{ secrets.MONGODB_URI }}
+          JWTPRIVATEKEY: ${{ secrets.JWT_PRIVATE_KEY }}
+          SALT: ${{ secrets.SALT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+          BASE_URL: "https://jobmatchplatform-server.azurewebsites.net"
+          CLIENT_URL: "https://lemon-coast-01b0ad500.3.azurestaticapps.net"
+          ALLOWED_ORIGINS: "https://lemon-coast-01b0ad500.3.azurestaticapps.net"
+
+  # Frontend deployment job
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    name: Deploy Frontend
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: './client/package-lock.json'
+
+      - name: Install Frontend Dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Build Frontend
+        working-directory: ./client
+        run: npm run build
+        env:
+          REACT_APP_API_URL: "https://jobmatchplatform-server.azurewebsites.net"
+
+      - name: Deploy Frontend to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LEMON_COAST_01B0AD500 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "./client"
+          output_location: "build"
