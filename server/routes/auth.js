@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const Joi = require("joi");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
+const passport = require("passport");
+require("../config/passport");
 
 // Login route
 router.post("/", async (req, res) => {
@@ -125,5 +127,35 @@ const validatePassword = (data) => {
     });
     return schema.validate(data);
 };
+
+// Google OAuth routes
+router.get(
+    "/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+    "/google/callback",
+    passport.authenticate("google", { session: false }),
+    (req, res) => {
+        const token = req.user.generateAuthToken();
+        res.redirect(`${process.env.CLIENT_URL}?token=${token}&isAdmin=${req.user.isAdmin}`);
+    }
+);
+
+// GitHub OAuth routes
+router.get(
+    "/github",
+    passport.authenticate("github", { scope: ["user:email"] })
+);
+
+router.get(
+    "/github/callback",
+    passport.authenticate("github", { session: false }),
+    (req, res) => {
+        const token = req.user.generateAuthToken();
+        res.redirect(`${process.env.CLIENT_URL}?token=${token}&isAdmin=${req.user.isAdmin}`);
+    }
+);
 
 module.exports = router;

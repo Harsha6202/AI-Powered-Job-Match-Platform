@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const connection = require("./db");
+const passport = require("passport");
 const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const jobRoutes = require("./routes/jobs");
@@ -21,24 +22,20 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 // middlewares
 app.use(express.json());
+app.use(passport.initialize());
 app.use(cors({
-    origin: function(origin, callback) {
-        // allow requests with no origin (like mobile apps, curl requests)
-        if(!origin) return callback(null, true);
-        
-        if(allowedOrigins.indexOf(origin) === -1){
-            var msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-            return callback(new Error(msg), false);
-        }
-        return callback(null, true);
-    },
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-    preflightContinue: true // Added to ensure preflight requests are handled
+    credentials: true
 }));
 
-// API documentation route
+// routes
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/jobs", jobRoutes);
+
+// API documentation routecd
 app.get("/", (req, res) => {
     res.json({
         status: "API is running",

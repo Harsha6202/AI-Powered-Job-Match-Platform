@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
 	lastName: { type: String, required: true },
 	email: { type: String, required: true },
 	password: { type: String, required: true },
+	googleId: { type: String },
+	githubId: { type: String },
 	location: { type: String },
 	yearsOfExperience: { type: Number },
 	skills: [{ type: String }],

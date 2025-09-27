@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import styles from "./styles.module.css";
 import config from "../../config";
+import Oauth from "../Oauth";
 
 const Login = () => {
 	const [data, setData] = useState({ email: "", password: "" });
@@ -60,6 +61,10 @@ const Login = () => {
 						<Link to="/forgot-password" className={styles.forgot_link}>
 							Forgot Password?
 						</Link>
+						<p className={styles.divider}>
+							Sign in with other accounts
+						</p>
+						<Oauth />
 						{error && <div className={styles.error_msg}>{error}</div>}
 						<button type="submit" className={styles.green_btn}>
 							Sign In
