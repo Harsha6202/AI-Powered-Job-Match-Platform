@@ -1,5 +1,8 @@
 const mongoose = require("mongoose");
 
+// Set strictQuery to false to prepare for Mongoose 7
+mongoose.set('strictQuery', false);
+
 module.exports = async () => {
     const connectionParams = {
         useNewUrlParser: true,
@@ -7,9 +10,6 @@ module.exports = async () => {
     };
 
     try {
-        // Log the database URI to ensure it's correctly loaded
-        console.log('Database URI:', process.env.DB);
-
         // Use async/await for better error handling
         await mongoose.connect(process.env.DB, connectionParams);
         console.log("Connected to database successfully");
