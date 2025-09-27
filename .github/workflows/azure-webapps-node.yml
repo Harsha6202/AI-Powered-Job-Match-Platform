@@ -1,20 +1,25 @@
 # Deploy Node.js app to Azure Web App with Docker
-name: Build and deploy Node.js app to Azure Web App - jobmatchplatform-server
+name: Deploy Backend to Azure
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'server/**'
   workflow_dispatch:
 
 env:
   AZURE_WEBAPP_NAME: jobmatchplatform-server
   REGISTRY: ghcr.io
-  IMAGE_NAME: harsha6202/ai-powered-job-match-platform-server
+  IMAGE_NAME: harsha6202/jobmatch-server
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
     permissions:
       contents: read
       packages: write
@@ -28,26 +33,28 @@ jobs:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ghcr.io/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha,prefix=
-            latest
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./server
+          file: ./server/Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ghcr.io/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -69,4 +76,4 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}'
+          images: ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
